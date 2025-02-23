@@ -21,7 +21,7 @@ app.use((req, res, next) => {
 // Endpoint สำหรับ Proxy ที่จะส่งคำขอไปยัง Google Apps Script
 app.all("/proxy", async (req, res) => {
   // URL ของ Google Apps Script Web App
-  const googleAppsScriptUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";
+  const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbxqfsXWmCqjph693Bau-8HB88IqwZkbn166SgcbW_AT5djxcwPDuT6rQGHvLm-vCglc/exec";
   
   // หากเป็น GET request ให้ต่อ query parameters เข้าไป
   let url = googleAppsScriptUrl;
