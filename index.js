@@ -1,31 +1,27 @@
-// index.js
+// นำเข้า Express และ node-fetch
 const express = require("express");
-const fetch = require("node-fetch"); // หากใช้ Node.js เวอร์ชัน 18+ สามารถใช้ global fetch ได้
+const fetch = require("node-fetch"); // ใช้ node-fetch สำหรับทำ HTTP requests
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// รองรับ JSON body
+// ใช้งาน JSON body
 app.use(express.json());
 
-// ตั้งค่า CORS headers ให้อนุญาตเฉพาะโดเมนของคุณ
+// ตั้งค่า CORS headers เพื่ออนุญาตเฉพาะโดเมนที่ต้องการ
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://bujersey.netlify.app"); // ให้เฉพาะโดเมนนี้เข้าถึง
+  res.header("Access-Control-Allow-Origin", "https://bujersey.netlify.app");  // อนุญาตให้เข้าถึงจากโดเมนนี้
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
-  
-  // สำหรับ Preflight Request (OPTIONS)
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200); // ตอบกลับด้วยสถานะ 200 สำหรับ Preflight
+    return res.sendStatus(200);  // ส่งสถานะ 200 หากเป็นคำขอ OPTIONS
   }
-  
   next();
 });
 
-// Endpoint proxy สำหรับส่งคำขอไปยัง Google Apps Script
+// Endpoint สำหรับ Proxy ที่จะส่งคำขอไปยัง Google Apps Script
 app.all("/proxy", async (req, res) => {
-  // URL ของ Google Apps Script Web App
-  const googleAppsScriptUrl = "https://script.google.com/macros/s/AKfycbxqfsXWmCqjph693Bau-8HB88IqwZkbn166SgcbW_AT5djxcwPDuT6rQGHvLm-vCglc/exec";
-  
+  const googleAppsScriptUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";  // URL ของ Google Apps Script Web App
+
   // หากเป็น GET request ให้ต่อ query parameters เข้าไป
   let url = googleAppsScriptUrl;
   if (req.method === "GET" && Object.keys(req.query).length) {
@@ -34,30 +30,27 @@ app.all("/proxy", async (req, res) => {
   }
 
   try {
-    // กำหนด options สำหรับ fetch
     const options = {
       method: req.method,
-      headers: { "Content-Type": "application/json" }
+      headers: { "Content-Type": "application/json" },
     };
 
-    // ถ้าเป็น POST ให้ส่งข้อมูลใน body
+    // หากเป็น POST request ให้เพิ่ม body ลงไป
     if (req.method === "POST") {
       options.body = JSON.stringify(req.body);
     }
 
     // ส่งคำขอไปยัง Google Apps Script
     const response = await fetch(url, options);
-
-    // รับข้อมูลจาก Google Apps Script และส่งกลับไปยัง client
-    const data = await response.text(); // รับข้อมูลเป็น text แล้วส่งกลับไปยัง client
-    res.send(data);
+    const data = await response.json();  // แปลงข้อมูลจาก JSON
+    res.json(data);  // ส่งข้อมูลกลับไปยัง client
   } catch (error) {
     console.error("Proxy error:", error);
     res.status(500).json({ error: "Error fetching from Google Apps Script" });
   }
 });
 
-// เริ่ม server
+// เริ่มต้น server
 app.listen(PORT, () => {
   console.log(`Proxy server is running on port ${PORT}`);
 });
