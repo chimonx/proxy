@@ -1,10 +1,10 @@
-// นำเข้า Express และ node-fetch
+// index.js
 const express = require("express");
-const fetch = require("node-fetch"); // ใช้ node-fetch สำหรับทำ HTTP requests
+const fetch = require("node-fetch"); // ใช้ node-fetch เวอร์ชัน 2
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// ใช้งาน JSON body
+// รองรับ JSON body
 app.use(express.json());
 
 // ตั้งค่า CORS headers เพื่ออนุญาตเฉพาะโดเมนที่ต้องการ
@@ -20,8 +20,9 @@ app.use((req, res, next) => {
 
 // Endpoint สำหรับ Proxy ที่จะส่งคำขอไปยัง Google Apps Script
 app.all("/proxy", async (req, res) => {
-  const googleAppsScriptUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";  // URL ของ Google Apps Script Web App
-
+  // URL ของ Google Apps Script Web App
+  const googleAppsScriptUrl = "https://script.google.com/macros/s/YOUR_SCRIPT_URL_HERE/exec";
+  
   // หากเป็น GET request ให้ต่อ query parameters เข้าไป
   let url = googleAppsScriptUrl;
   if (req.method === "GET" && Object.keys(req.query).length) {
@@ -54,3 +55,4 @@ app.all("/proxy", async (req, res) => {
 app.listen(PORT, () => {
   console.log(`Proxy server is running on port ${PORT}`);
 });
+ 
