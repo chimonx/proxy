@@ -9,7 +9,7 @@ app.use(express.json());
 
 // ตั้งค่า CORS headers เพื่ออนุญาตเฉพาะโดเมนที่ต้องการ
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://bujersey.netlify.app");  // อนุญาตให้เข้าถึงจากโดเมนนี้
+  res.header("Access-Control-Allow-Origin", "https://jersey-update.smobu.cloud");  // อนุญาตให้เข้าถึงจากโดเมนนี้
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
   if (req.method === "OPTIONS") {
