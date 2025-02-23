@@ -9,12 +9,15 @@ app.use(express.json());
 
 // ตั้งค่า CORS headers ให้อนุญาตเฉพาะโดเมนของคุณ
 app.use((req, res, next) => {
-  res.header("Access-Control-Allow-Origin", "https://bujersey.netlify.app");
+  res.header("Access-Control-Allow-Origin", "https://bujersey.netlify.app"); // ให้เฉพาะโดเมนนี้เข้าถึง
   res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS");
   res.header("Access-Control-Allow-Headers", "Content-Type");
+  
+  // สำหรับ Preflight Request (OPTIONS)
   if (req.method === "OPTIONS") {
-    return res.sendStatus(200);
+    return res.sendStatus(200); // ตอบกลับด้วยสถานะ 200 สำหรับ Preflight
   }
+  
   next();
 });
 
@@ -37,11 +40,15 @@ app.all("/proxy", async (req, res) => {
       headers: { "Content-Type": "application/json" }
     };
 
+    // ถ้าเป็น POST ให้ส่งข้อมูลใน body
     if (req.method === "POST") {
       options.body = JSON.stringify(req.body);
     }
 
+    // ส่งคำขอไปยัง Google Apps Script
     const response = await fetch(url, options);
+
+    // รับข้อมูลจาก Google Apps Script และส่งกลับไปยัง client
     const data = await response.text(); // รับข้อมูลเป็น text แล้วส่งกลับไปยัง client
     res.send(data);
   } catch (error) {
